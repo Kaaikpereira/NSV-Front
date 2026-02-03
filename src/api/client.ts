@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3333/api';
+const BASE_URL = 'https://484aca27a0cf.ngrok-free.app/api';
 
 export function getAuthToken(): string | null {
   return localStorage.getItem('nsv_access_token');
