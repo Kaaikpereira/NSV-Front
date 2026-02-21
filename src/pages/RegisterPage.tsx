@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Shield, Loader2, Mail, Lock } from 'lucide-react'
+import { Shield, Loader2, Mail, Lock, User } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,46 +8,50 @@ import { Label } from '@/components/ui/label'
 import { setAuthToken } from '@/api/client'
 import { toast } from 'sonner'
 import { BaseUrl } from '@/utils/localhost'
-import { getDeviceId } from '@/utils/deviceId'
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!email.trim() || !password.trim()) {
-      toast.error('Informe email e senha')
+    if (!name || !email || !password || !confirmPassword) {
+      toast.error('Preencha todos os campos')
+      return
+    }
+
+    if (password !== confirmPassword) {
+      toast.error('As senhas não conferem')
       return
     }
 
     setIsLoading(true)
 
     try {
-      const deviceId = getDeviceId();
-
-      const response = await fetch(`${BaseUrl}/auth/login`, {
+      const response = await fetch(`${BaseUrl}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          displayName: name.trim(),
           email: email.trim(),
           password: password.trim(),
-          deviceId,
         }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        toast.error(data.error || 'Credenciais inválidas')
+        toast.error(data.error || 'Erro ao criar conta')
         return
       }
 
       setAuthToken(data.token)
-      navigate('/')
+      navigate('/onboarding/display-name')
     } catch {
       toast.error('Erro ao conectar ao servidor')
     } finally {
@@ -64,13 +68,13 @@ export default function LoginPage() {
             Nexon Secure Vault
           </h2>
           <p className="text-primary-foreground/80 leading-relaxed">
-            Plataforma financeira segura para gestão de ativos digitais,
-            transações protegidas por criptografia proprietária.
+            Crie sua conta para acessar um ambiente financeiro seguro,
+            com tecnologia de criptografia proprietária.
           </p>
         </div>
       </div>
 
-      {/* LOGIN */}
+      {/* REGISTER */}
       <div className="flex w-full md:w-1/2 items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
@@ -93,7 +97,7 @@ export default function LoginPage() {
             </div>
             <div>
               <h1 className="text-lg font-semibold text-foreground">
-                Acessar conta
+                Criar conta
               </h1>
               <p className="text-xs text-muted-foreground">
                 Nexon Secure Vault
@@ -102,7 +106,29 @@ export default function LoginPage() {
           </div>
 
           {/* FORM */}
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleRegister} className="space-y-5">
+            {/* Nome completo */}
+            <div className="space-y-2">
+              <Label className="text-foreground">Nome completo</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  disabled={isLoading}
+                  className="
+                    pl-10 h-11
+                    bg-card
+                    border border-input
+                    text-foreground
+                    placeholder:text-[hsl(var(--muted-foreground))/0.7]
+                    focus:border-[hsl(var(--accent))]
+                    focus:ring-1 focus:ring-[hsl(var(--accent))/0.3]
+                  "
+                />
+              </div>
+            </div>
+
             {/* Email */}
             <div className="space-y-2">
               <Label className="text-foreground">Email</Label>
@@ -149,13 +175,27 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex justify-between text-sm">
-              <Link
-                to="/forgot-password"
-                className="text-[hsl(var(--accent))] hover:underline"
-              >
-                Esqueci minha senha
-              </Link>
+            {/* Confirmar senha */}
+            <div className="space-y-2">
+              <Label className="text-foreground">Confirmar senha</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  disabled={isLoading}
+                  className="
+                    pl-10 h-11
+                    bg-card
+                    border border-input
+                    text-foreground
+                    placeholder:text-[hsl(var(--muted-foreground))/0.7]
+                    focus:border-[hsl(var(--accent))]
+                    focus:ring-1 focus:ring-[hsl(var(--accent))/0.3]
+                  "
+                />
+              </div>
             </div>
 
             <Button
@@ -175,22 +215,22 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Validando credenciais
+                  Criando conta
                 </>
               ) : (
-                'Entrar'
+                'Criar conta'
               )}
             </Button>
           </form>
 
           {/* FOOTER */}
           <div className="text-center text-sm text-muted-foreground">
-            Não possui conta?{' '}
+            Já possui conta?{' '}
             <Link
-              to="/register"
+              to="/login"
               className="font-semibold text-[hsl(var(--accent))] hover:underline"
             >
-              Criar conta
+              Acessar
             </Link>
           </div>
         </motion.div>

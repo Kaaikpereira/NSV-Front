@@ -8,6 +8,9 @@ import {
   ShoppingBag,
   LogOut,
   Shield,
+  Settings,
+  FileText,
+  UserStar, 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { clearAuthToken } from '@/api/client';
@@ -19,18 +22,21 @@ interface NavItem {
   icon: typeof LayoutDashboard;
 }
 
-const navItems: NavItem[] = [
-  { label: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { label: 'Extrato', href: '/extrato', icon: Receipt },
-  { label: 'Pagamentos', href: '/pagamentos', icon: CreditCard },
-  { label: 'Nix', href: '/nix', icon: Zap },
-  { label: 'Loja NSV', href: '/loja', icon: ShoppingBag },
-];
+const baseNavItems: NavItem[] = [
+    { label: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { label: 'Extrato', href: '/extrato', icon: Receipt },
+    { label: 'Pagamentos', href: '/pagamentos', icon: CreditCard },
+    { label: 'Nix', href: '/nix', icon: Zap },
+    { label: 'Loja NSV', href: '/loja', icon: ShoppingBag },
+    { label: 'Configurações', href: '/config', icon: Settings },
+    
+  ];
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
+// DashboardLayout.tsx (versão alinhada com index.css)
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,31 +47,45 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     navigate('/login');
   };
 
+  const navItems =
+    user?.role === 'admin'
+      ? [...baseNavItems, { label: 'Logs (admin)', href: '/admin/audit-logs', icon: FileText },
+       { label: 'Dashboard Admin', href: '/admin', icon: UserStar },
+
+      ]
+      : baseNavItems
+
+
   return (
-    <div className="flex min-h-screen w-full">
+    <div className="flex min-h-screen w-full bg-[hsl(var(--background))]">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar text-sidebar-foreground">
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-[hsl(var(--sidebar-background))] text-[hsl(var(--sidebar-foreground))]">
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex h-20 items-center gap-3 border-b border-sidebar-border px-6">
+          <div className="flex h-20 items-center gap-3 border-b border-[hsl(var(--sidebar-border))] px-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg nsv-gradient">
-              <Shield className="h-6 w-6 text-white" />
+              <Shield className="h-6 w-6 text-[hsl(var(--sidebar-foreground))]" />
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight">BANCO NSV</h1>
-              <p className="text-xs text-sidebar-muted">Nexon Secure Vault</p>
+              <p className="text-xs text-[hsl(var(--sidebar-muted))]">
+                Nexon Secure Vault
+              </p>
             </div>
           </div>
 
           {/* User Info */}
           {user && (
-            <div className="border-b border-sidebar-border px-6 py-4">
-              <p className="text-sm font-medium truncate">
+            <div className="border-b border-[hsl(var(--sidebar-border))] px-6 py-4">
+              <p className="truncate text-sm font-medium">
                 {user.display_name || user.email || 'Usuário'}
               </p>
               {account && (
-                <p className="account-number text-sidebar-muted mt-1">
-                  Conta: {account.account_display}
+                <p className="mt-1 text-xs text-[hsl(var(--sidebar-muted))]">
+                  Conta:{' '}
+                  <span className="font-mono">
+                    {account.account_display}
+                  </span>
                 </p>
               )}
             </div>
@@ -84,8 +104,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                     isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                      : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                      ? 'sidebar-link-active'
+                      : 'text-[hsl(var(--sidebar-foreground))]/70 hover:bg-[hsl(var(--sidebar-accent))]/60 hover:text-[hsl(var(--sidebar-foreground))]'
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -96,10 +116,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </nav>
 
           {/* Logout */}
-          <div className="border-t border-sidebar-border p-3">
+          <div className="border-t border-[hsl(var(--sidebar-border))] p-3">
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[hsl(var(--sidebar-foreground))]/70 transition-colors hover:bg-[hsl(var(--sidebar-accent))]/60 hover:text-[hsl(var(--sidebar-foreground))]"
             >
               <LogOut className="h-5 w-5" />
               Sair
@@ -110,7 +130,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <main className="ml-64 flex-1 min-h-screen">
-        <div className="p-8">{children}</div>
+        <div className="mx-auto max-w-6xl px-8 py-8">{children}</div>
       </main>
     </div>
   );

@@ -28,7 +28,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Transaction, TransactionType } from '@/types/api';
 import {
   getTransactionTypeLabel,
-  isDebitTransaction,
   isNixTransaction,
 } from '@/hooks/useTransactions';
 import { cn } from '@/lib/utils';
@@ -40,6 +39,7 @@ interface TransactionsTableProps {
 
 type PeriodFilter = '7' | '30' | 'all';
 type TypeFilter = 'all' | 'payment' | 'nix' | 'purchase' | 'transfer';
+
 
 function getTransactionIcon(type: TransactionType) {
   switch (type) {
@@ -158,8 +158,9 @@ export function TransactionsTable({
             <TableBody>
               {filteredTransactions.map((transaction) => {
                 const Icon = getTransactionIcon(transaction.type);
-                const isDebit = isDebitTransaction(transaction.type);
                 const isNix = isNixTransaction(transaction.type);
+                const isDebit = transaction.direction === 'debit';
+                const isCredit = transaction.direction === 'credit';
 
                 return (
                   <TableRow key={transaction.id} className="animate-fade-in">
@@ -186,7 +187,11 @@ export function TransactionsTable({
                           />
                         </div>
                         <span className="font-medium">
-                          {getTransactionTypeLabel(transaction.type)}
+                          {isNix
+                            ? isDebit
+                              ? 'Nix enviada'
+                              : 'Nix recebida'
+                            : getTransactionTypeLabel(transaction.type)}
                         </span>
                       </div>
                     </TableCell>

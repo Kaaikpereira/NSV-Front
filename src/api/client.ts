@@ -1,4 +1,7 @@
-const BASE_URL = 'https://4047d877534c.ngrok-free.app/api';
+import { BaseUrl } from "@/utils/localhost";
+
+// src/api/client.ts
+const BASE_URL = BaseUrl; // ajuste pro seu backend, ou use variável de ambiente
 
 export function getAuthToken(): string | null {
   return localStorage.getItem('nsv_access_token');
@@ -10,6 +13,10 @@ export function setAuthToken(token: string): void {
 
 export function clearAuthToken(): void {
   localStorage.removeItem('nsv_access_token');
+}
+
+function markAuthExpired() {
+  localStorage.setItem('nsv_auth_expired', '1');
 }
 
 export class ApiError extends Error {
@@ -40,7 +47,6 @@ export async function apiClient<T>(
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    'ngrok-skip-browser-warning': 'true',
     ...fetchOptions.headers,
   };
 
@@ -54,8 +60,9 @@ export async function apiClient<T>(
   });
 
   if (!response.ok) {
-    if (response.status === 401) {
+    if (response.status === 401 && !skipAuth) {
       clearAuthToken();
+      markAuthExpired();
       throw new ApiError('Sessão expirada, faça login novamente', 401);
     }
 
@@ -73,5 +80,19 @@ export async function apiClient<T>(
     );
   }
 
-  return response.json();
+  // ===== sucesso =====
+
+  // 204 No Content -> não tentar fazer json
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const text = await response.text();
+
+  // 200/201 sem body -> também não tentar parsear JSON
+  if (!text) {
+    return undefined as T;
+  }
+
+  return JSON.parse(text) as T;
 }

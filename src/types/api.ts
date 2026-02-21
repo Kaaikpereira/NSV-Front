@@ -1,8 +1,15 @@
 export type UserRole = 'dev' | 'admin';
 export type AccountStatus = 'active' | 'blocked' | 'closed';
-export type TransactionType = 'nix' | 'payment' | 'purchase' | 'transfer' | 'nix_send' | 'nix_receive';
+export type TransactionType =
+  | 'nix'
+  | 'payment'
+  | 'purchase'
+  | 'transfer'
+  | 'nix_send'
+  | 'nix_receive';
 
 export interface User {
+  updated_at: any;
   id: string;
   email: string | null;
   display_name: string | null;
@@ -28,6 +35,11 @@ export interface Transaction {
   amount: number;
   description: string | null;
   created_at: string;
+
+  // novos campos para UI de Nix / extrato
+  direction?: 'debit' | 'credit'; // opcional, se você não quiser mudar o backend agora
+  counterparty_account?: string | null;
+  counterparty_name?: string | null;
 }
 
 export interface TransactionsResponse {

@@ -1,30 +1,44 @@
-import { apiClient } from './client';
-import type { NixTransferInput, NixTransferResponse, CreateTransactionInput, CreateTransactionResponse } from '@/types/api';
+// src/api/nixApi.ts
+import { getAuthToken, ApiError, clearAuthToken } from '@/api/client';
+import type { NixTransferInput, NixTransferResponse } from '@/types/api';
+import { BaseUrl } from '@/utils/localhost';
 
-// Tenta usar a rota dedicada de Nix, fallback para /transactions
-export async function transferNix(
-  input: NixTransferInput
-): Promise<NixTransferResponse> {
-  try {
-    // Tenta a rota dedicada primeiro
-    return await apiClient<NixTransferResponse>('/nix/transfer', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    });
-  } catch (error) {
-    // Se a rota não existir (404), usa fallback
-    if (error instanceof Error && 'status' in error && (error as { status: number }).status === 404) {
-      const fallbackInput: CreateTransactionInput = {
-        type: 'nix',
-        amount: input.amount,
-        description: `Nix para ${input.to_account}${input.description ? ` - ${input.description}` : ''}`,
-      };
-      
-      return apiClient<CreateTransactionResponse>('/transactions', {
-        method: 'POST',
-        body: JSON.stringify(fallbackInput),
-      });
-    }
-    throw error;
+const BASE_URL = BaseUrl;
+
+export async function nixTransfer(input: NixTransferInput): Promise<NixTransferResponse> {
+  const token = getAuthToken();
+  if (!token) {
+    throw new ApiError('Token de autenticação não encontrado', 401);
   }
+
+  const res = await fetch(`${BASE_URL}/nix/transfer`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(input),
+  });
+
+  if (!res.ok) {
+    if (res.status === 401) {
+      clearAuthToken();
+      throw new ApiError('Sessão expirada, faça login novamente', 401);
+    }
+
+    let errorData: unknown;
+    try {
+      errorData = await res.json();
+    } catch {
+      errorData = null;
+    }
+
+    throw new ApiError(
+      (errorData as { message?: string })?.message || `Erro ${res.status}`,
+      res.status,
+      errorData,
+    );
+  }
+
+  return (await res.json()) as NixTransferResponse;
 }

@@ -6,9 +6,9 @@
 
 @layer base {
   :root {
-    /* Banking theme - Professional dark sidebar with clean content */
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    /* Fundo geral igual login */
+    --background: 210 20% 98%; /* #F5F7FA */
+    --foreground: 222 47% 11%; /* #0B1220 */
 
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
@@ -16,82 +16,52 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* NSV Brand - Deep emerald green */
-    --primary: 160 84% 39%;
-    --primary-foreground: 0 0% 100%;
+    /* NSV Brand - Azul escuro igual login */
+    --primary: 212 61% 17%;          /* ~#0F2A44 */
+    --primary-foreground: 210 20% 98%; /* quase branco */
 
-    --secondary: 215 20% 95%;
+    --secondary: 210 32% 94%;          /* ~#D9E1EC */
     --secondary-foreground: 222 47% 11%;
 
     --muted: 215 20% 95%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 215 16% 47%;   /* ~#6B7280 */
 
-    --accent: 160 84% 39%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 205 75% 42%;            /* ~#1E6F9F */
+    --accent-foreground: 210 20% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Transaction colors */
+    /* Transaction colors podem ficar iguais ou ajustar depois */
     --credit: 142 76% 36%;
     --credit-foreground: 0 0% 100%;
     --debit: 0 84% 60%;
     --debit-foreground: 0 0% 100%;
 
-    /* Sidebar - Dark slate */
-    --sidebar-background: 222 47% 11%;
+    /* Sidebar - usar primária como base */
+    --sidebar-background: 212 61% 17%;      /* #0F2A44 */
     --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 160 84% 39%;
+    --sidebar-primary: 205 75% 42%;        /* #1E6F9F */
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent: 213 53% 24%;         /* ~#12385C */
     --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 160 84% 39%;
+    --sidebar-border: 213 53% 24%;
+    --sidebar-ring: 205 75% 42%;
     --sidebar-muted: 215 16% 47%;
 
-    --border: 214 32% 91%;
+    --border: 214 32% 91%; /* #D9E1EC */
     --input: 214 32% 91%;
-    --ring: 160 84% 39%;
+    --ring: 205 75% 42%;
 
     --radius: 0.75rem;
 
-    /* Nix brand color */
+    /* Nix brand color (deixa como está) */
     --nix: 271 81% 56%;
     --nix-foreground: 0 0% 100%;
 
     /* Store accent */
     --store: 38 92% 50%;
     --store-foreground: 0 0% 100%;
-  }
-
-  .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 20% 98%;
-
-    --card: 217 33% 17%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 217 33% 17%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 160 84% 39%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 160 84% 39%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 20% 98%;
-
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 160 84% 39%;
   }
 }
 
@@ -143,8 +113,12 @@
 
   /* NSV Brand gradient */
   .nsv-gradient {
-    background: linear-gradient(135deg, hsl(160, 84%, 39%) 0%, hsl(160, 84%, 29%) 100%);
-  }
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--sidebar-accent)) 100%
+  );
+}
 
   /* Nix gradient */
   .nix-gradient {
@@ -155,6 +129,10 @@
   .store-gradient {
     background: linear-gradient(135deg, hsl(38, 92%, 50%) 0%, hsl(38, 92%, 40%) 100%);
   }
+/* Avatar visibility fix for HeroUser component */
+  .nsv-avatar-visible img {
+  opacity: 1 !important;
+}
 }
 
 @layer utilities {
