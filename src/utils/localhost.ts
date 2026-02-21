@@ -1,1 +1,1 @@
-export const BaseUrl = "http://192.168.0.72:3333/api"
+export const BaseUrl = "https://nsv-backend.vercel.app/api"

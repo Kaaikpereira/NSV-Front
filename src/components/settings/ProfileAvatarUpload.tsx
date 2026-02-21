@@ -7,8 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Shield, User, Mail } from 'lucide-react';
 import { uploadAvatar } from '@/api/avatarClient';
 import { getAuthToken } from '@/api/client';
+import { BaseUrl } from '@/utils/localhost';
 
-const AVATAR_URL = 'http://192.168.0.72:3333/api/me/avatar';
+const AVATAR_URL = `${BaseUrl}/me/avatar`;
 
 export default function ConfigPage() {
   const { user, account, isLoading, isError, refreshMe } = useMe();
