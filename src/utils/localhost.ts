@@ -1,1 +1,1 @@
-export const BaseUrl = "https://nsv-backend.vercel.app/api"
+export const BaseUrl = "https://nsv-backend.onrender.com/api"
